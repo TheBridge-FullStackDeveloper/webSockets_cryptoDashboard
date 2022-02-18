@@ -1,34 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './App.css';
 import Header from './components/header/header';
 import Footer from './components/footer/footer';
 import { io } from "socket.io-client";
 
 
 const App = () => {
+  const [info, setInfo] = useState(false)
 
   
-  // // configuración principal del WebSocket
-  // const [info, setInfo] = useState(false)
-  // const ws = useRef(null);
-  // const socket = io.socket("wss://ws-feed.pro.coinbase.com"); // main namespace
-  // ws.current = new WebSocket("wss://ws-feed.pro.coinbase.com");
-  // // ws.current = new WebSocket("wss://ws-feed.exchange.coinbase.com"); for if the flyes
-
-  
-
-  // useEffect(()=>{
-
-  //   socket.on("connect", () => {
-
-  //     console.log(socket?.connected); // connection id
-
-  //     console.log("eeeeehhhhh"+socket.id); // connection id
-
-  //   });
+  useEffect(()=>{ // maneja la primera petición al servidor
+    
+    // configuración principal del WebSocket
+    const socket = io.connect("wss://ws-feed.pro.coinbase.com");
+    socket.on("connect", () => {
+        
+    });
     
 
-  // },[])
+  },[])
 
   // useEffect(()=>{
 
@@ -55,17 +44,17 @@ const App = () => {
   //     }
   //   };
 
-  // },[info])
+  // })
 
-  // const handleAsk = () =>{
-  //   setInfo(!info)
-  // }
+  const handleAsk = () =>{
+    setInfo(!info)
+  }
 
     return (
       <div className="App">
         <Header/>
         <h1>¿Se ve?</h1>
-        <button onClick={handleAsk}>Pedir</button>
+        {/* <button onClick={handleAsk}>Pedir</button> */}
         <Footer/>
       </div>
     );
