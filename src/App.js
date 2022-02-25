@@ -6,122 +6,158 @@ import { io } from "socket.io-client";
 
 const App = () => {
   const [info, setInfo] = useState(false);
-  const [currencies, setcurrencies] = useState([]);
-
+  const [currencies, setCurrencies] = useState([]);
+  const [pair, setPair] = useState("")
 
   const url = "https://api.pro.coinbase.com";
   let pairs = [];
+  let flag = useRef(false);
 
+  const socket ="";
+
+  // informacion necesaria para la conexion al socket
+  let subMsg = 
+  {
+    "type": "subscribe",
+    "product_ids": [
+        "ETH-USD",
+        "ETH-EUR"
+    ],
+    "channels": [
+        "level2",
+        "heartbeat",
+        {
+            "name": "ticker",
+            "product_ids": [
+                "ETH-BTC",
+                "ETH-USD"
+            ]
+        }
+    ]
+  };
+
+  let unSubMsg = {
+    "type": "unsubscribe",
+    "channels": ["heartbeat"]
+  }
   
   useEffect(()=>{ // maneja la primera petición al servidor
     
-    // peticion a la api
-    const apiCall = async ()=> {
-      // peticion
-      await fetch(url + "/products")
-      .then((res) => res.json())
-      .then((data) => (pairs = data));
-      console.log(pairs)
-      
-      // filtrar las criptos cruzadas con el euro
-      let filtered = pairs.filter((pair) => {
-        if (pair.quote_currency === "EUR") {
-          return pair;
-        }
-      });
-      console.log(filtered)
-
-      
-      // ordenar el array filtrado de criptos en base a su valor
-      filtered = filtered.sort((a, b) => {
-        if( a.base_currency == b.base_currency ) { return 0; }
-        else return ( a.base_currency > b.base_currency ? 1 : -1 )
+    socket = io.connect("wss://ws-feed.pro.coinbase.com")("httpClient",{
+      cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"]
+      }
     });
-    console.log(filtered)
+  // peticion a la api
+  const apiCall = async ()=> {
+
+    // seteamos la primera petición al webSocket
+
+    // peticion
+    await fetch(url + "/products")
+    .then((res) => res.json())
+    .then((data) => (pairs = data));
+    console.log(pairs)
     
+    // filtrar las criptos cruzadas con el euro
+    let filtered = pairs.filter((pair) => {
+      if (pair.quote_currency === "EUR") {
+        return pair;
+      }
+    });
 
-    setcurrencies(filtered);
+    // ordenar por nombre el array filtrado de criptos
+    filtered = filtered.sort((a, b) => {
+      if( a.base_currency == b.base_currency ) { return 0; }
+      else return ( a.base_currency > b.base_currency ? 1 : -1 )
+    });
+
+    // console.log(filtered)
+    setCurrencies(filtered);
     
-    // first.current = true;
-
-    
-
-
+    // evitar la conexion al socket si no hay un fetch previo
+    flag.current = true;
   };
   apiCall();
 
+  },[]) // render en la primera carga
+
+
+  useEffect(()=>{
+    if (!flag.current) { return; };
 
     // configuración principal del WebSocket
-    const socket = io.connect("wss://ws-feed.pro.coinbase.com");
     socket.on("connect", (data) => {
       console.log(`is my socket connected? +${socket.connected} \n the id is ${socket.id}`);
       console.log(data)
     });
     
-    // pedir suscripción al servidor
-    let msg = 
-    {
-      "type": "subscribe",
-      "product_ids": [
-          "ETH-USD",
-          "ETH-EUR"
-      ],
-      "channels": [
-          "level2",
-          "heartbeat",
-          {
-              "name": "ticker",
-              "product_ids": [
-                  "ETH-BTC",
-                  "ETH-USD"
-              ]
-          }
-      ]
-    };
-
-    // esto es lo que tiene el ejemplo:
-    // {
-    // type: "subscribe",
-    // product_ids: [pair],
-    // channels: ["ticker"]
-    // };
-
-    let jsonMsg = JSON.stringify(msg);
-    
-    // de aquí, una u otra
+    let jsonMsg = JSON.stringify(subMsg);
     // socket.on("message", jsonMsg);
     socket.send(jsonMsg);
 
-  },[])
 
-  // useEffect(()=>{
+    // no tengo ni idea de qué hace esto
+    let historicalDataURL = `${url}/products/${pair}/candles?granularity=86400`;
+    const fetchHistoricalData = async () => {
+      let dataArr = [];
+      await fetch(historicalDataURL)
+        .then((res) => res.json())
+        .then((data) => (dataArr = data));
+      
+      let formattedData = formatData(dataArr);
+      setpastData(formattedData);
+    };
+    fetchHistoricalData();
 
+
+    socket.on("message", (e) => {
+      let data = JSON.parse(e.data);
+      if (data.type !== "ticker") {
+        return;
+      }
+      if (data.product_id === pair) {
+        setprice(data.price);
+      }
+    });
+
+
+
+  },[pair])
 
     
-  //   // procesar la entrada de datos del socket
-  //   // socket.onmessage = (e) => { // el método es el propio de la API, no de socket.io
-  //   socket.on = (e) => {
-  //     let data = JSON.parse(e.data);
-  //     if (data.type !== "ticker") {
-  //       return;
-  //     }
+    // pedir suscripción al servidor
 
-  //     if (data.product_id === pair) {
-  //       setprice(data.price);
-  //     }
-  //   };
 
-  // })
 
-  const handleAsk = () =>{
-    setInfo(!info)
-  }
+
+
+
+  // estto maneja el selector de criptos
+  const handleSelect = (e) => {
+
+    // pedir la baja del socket
+    let unSub = JSON.stringify(unSubMsg);
+    socket.send(unSub);
+
+    // setPair cambiará el estado de pair y lanzará el useEffect para una nueva conexion
+    setPair(e.target.value);
+  };
 
     return (
       <div className="App">
         <Header/>
         <h1>¿Se ve?</h1>
-        {/* <button onClick={handleAsk}>Pedir</button> */}
+        <select name="currency" value={pair} onChange={handleSelect}>
+          {currencies.map((e, i) => {
+            return (
+              <option key={i} value={e.id}>
+                {e.display_name}
+              </option>
+            );
+          })}
+        </select>
         <Footer/>
       </div>
     );
