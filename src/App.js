@@ -3,35 +3,46 @@ import Header from './components/header/header';
 import Footer from './components/footer/footer';
 import { io } from "socket.io-client";
 
-
 const App = () => {
   const [info, setInfo] = useState(false);
   const [currencies, setCurrencies] = useState([]);
-  const [pair, setPair] = useState("")
+  const [pair, setPair] = useState("");
+  const [price, setprice] = useState("0.00");
+
+  
+  const socket = io("wss://ws-feed.exchange.coinbase.com");
 
   const url = "https://api.pro.coinbase.com";
+  let first = useRef(false);
+
+
+  // opcion 2 que no funciona
+  // const socket = io("https://api.pro.coinbase.com", {
+  //   withCredentials: true,
+  //   mode: 'cors',
+  //   credentials: 'include',
+  //   extraHeaders: {
+  //     'Access-Control-Allow-Credentials': 'true',
+  //   }
+  // });
+
+  // const url = "https://api.pro.coinbase.com";
   let pairs = [];
   let flag = useRef(false);
 
-  const socket ="";
-
-  // informacion necesaria para la conexion al socket
+  ///////////////////////////
+  // SERVER'S MESSAGE REQUEST
+  ///////////////////////////
   let subMsg = 
   {
     "type": "subscribe",
-    "product_ids": [
-        "ETH-USD",
-        "ETH-EUR"
-    ],
+    "product_ids": ["ETH-USD","ETH-EUR"],
     "channels": [
         "level2",
         "heartbeat",
         {
             "name": "ticker",
-            "product_ids": [
-                "ETH-BTC",
-                "ETH-USD"
-            ]
+            "product_ids": ["ETH-BTC","ETH-USD"]
         }
     ]
   };
@@ -42,14 +53,32 @@ const App = () => {
   }
   
   useEffect(()=>{ // maneja la primera petición al servidor
-    
-    socket = io.connect("wss://ws-feed.pro.coinbase.com")("httpClient",{
-      cors: {
-        origin: "http://localhost:3000",
-        methods: ["GET", "POST"]
-      }
+  console.log("entra 1")
+  ////////////////////
+  // SOCKET CONNECTION
+  ////////////////////
+
+    // forma 1
+    // socket = io.connect("wss://ws-feed.exchange.coinbase.com")
+    // ("Access-Control-Allow-Origin",{
+    // // mis problemas con cors
+    //   cors: {
+    //     origin: "http://localhost:3000",
+    //     methods: ["GET", "POST"]
+    //   }
+    // });
+
+    // forma 2
+    // socket = io.connect("wss://ws-feed.exchange.coinbase.com")
+
+    // forma 3
+    socket.on("connect", () => {
+      console.log(socket.id); // x8WIv7-mJelg7on_ALbx
     });
-  // peticion a la api
+
+  //////////////
+  // API REQUEST
+  //////////////
   const apiCall = async ()=> {
 
     // seteamos la primera petición al webSocket
@@ -85,46 +114,56 @@ const App = () => {
 
 
   useEffect(()=>{
-    if (!flag.current) { return; };
+    console.log("entra 2")
 
-    // configuración principal del WebSocket
-    socket.on("connect", (data) => {
-      console.log(`is my socket connected? +${socket.connected} \n the id is ${socket.id}`);
-      console.log(data)
-    });
-    
+    // esto evita peticionar al socket si no hay fetch previo
+    // if (!flag.current) {
+    //   return;
+    // }
+
     let jsonMsg = JSON.stringify(subMsg);
     // socket.on("message", jsonMsg);
-    socket.send(jsonMsg);
-
-
-    // no tengo ni idea de qué hace esto
-    let historicalDataURL = `${url}/products/${pair}/candles?granularity=86400`;
-    const fetchHistoricalData = async () => {
-      let dataArr = [];
-      await fetch(historicalDataURL)
-        .then((res) => res.json())
-        .then((data) => (dataArr = data));
-      
-      let formattedData = formatData(dataArr);
-      setpastData(formattedData);
-    };
-    fetchHistoricalData();
-
-
-    socket.on("message", (e) => {
+    socket.emit(jsonMsg);
+    // configuración principal del WebSocket
+    // socket.on("connect", (data) => {
+    //   console.log(`is my socket connected? +${socket.connected} \n the id is ${socket.id}`);
+    //   console.log(data)
+    // });
+    
+    //////////////////////
+    // EXTRACT SOCKET DATA
+    //////////////////////
+    socket.on("connect", (e) => {
       let data = JSON.parse(e.data);
-      if (data.type !== "ticker") {
-        return;
-      }
-      if (data.product_id === pair) {
-        setprice(data.price);
-      }
+      setprice(data.price);
+
+      // if (data.type !== "ticker") {
+      //   return;
+      // }
+
+      // if (data.product_id === pair) {
+      //   setprice(data.price);
+      // }
     });
 
+    // no tengo ni idea de qué hace esto
+    // let historicalDataURL = `${url}/products/${pair}/candles?granularity=86400`;
+    // const fetchHistoricalData = async () => {
+    //   let dataArr = [];
+    //   await fetch(historicalDataURL)
+    //     .then((res) => res.json())
+    //     .then((data) => (dataArr = data));
+      
+    //   let formattedData = formatData(dataArr);
+    //   setpastData(formattedData);
+    // };
+    // fetchHistoricalData();
 
 
-  },[pair])
+
+
+
+  },[currencies])
 
     
     // pedir suscripción al servidor
@@ -138,8 +177,8 @@ const App = () => {
   const handleSelect = (e) => {
 
     // pedir la baja del socket
-    let unSub = JSON.stringify(unSubMsg);
-    socket.send(unSub);
+    // let unSub = JSON.stringify(unSubMsg);
+    // socket.send(unSub);
 
     // setPair cambiará el estado de pair y lanzará el useEffect para una nueva conexion
     setPair(e.target.value);
@@ -148,7 +187,8 @@ const App = () => {
     return (
       <div className="App">
         <Header/>
-        <h1>¿Se ve?</h1>
+        <h1>`€{price}`</h1>
+
         <select name="currency" value={pair} onChange={handleSelect}>
           {currencies.map((e, i) => {
             return (
