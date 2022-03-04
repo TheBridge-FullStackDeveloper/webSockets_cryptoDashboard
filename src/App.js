@@ -2,6 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/header/header';
 import Footer from './components/footer/footer';
 import { io } from "socket.io-client";
+/////////////
+// REFERENCES
+/////////////
+// https://socket.io/docs/v4/client-with-bundlers/
+// https://docs.cloud.coinbase.com/exchange/docs/websocket-overview
 
 const App = () => {
   const [info, setInfo] = useState("I don't know");
