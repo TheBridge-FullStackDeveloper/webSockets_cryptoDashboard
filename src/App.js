@@ -1,24 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/header/header';
 import Footer from './components/footer/footer';
-import { io } from "socket.io-client";
-/////////////
-// REFERENCES
-/////////////
-// https://socket.io/docs/v4/client-with-bundlers/
-// https://docs.cloud.coinbase.com/exchange/docs/websocket-overview
 
 const App = () => {
   const [info, setInfo] = useState("I don't know");
   const [currencies, setCurrencies] = useState([]);
   const [pair, setPair] = useState("");
   const [price, setprice] = useState("0.00");
-
-  // así se setea la direccion a la que pedir el socket
-  const socket = io("wss://ws-feed.exchange.coinbase.com");
-
   const url = "https://api.pro.coinbase.com";
-  let first = useRef(false);
+  const ws = useRef(null);
   let flag = useRef(false);
   let pairs = [];
 
@@ -38,85 +28,72 @@ const App = () => {
         }
     ]
   };
-
   let unSubMsg = {
     "type": "unsubscribe",
     "channels": ["heartbeat"]
   }
   
-  useEffect(()=>{ // maneja la primera petición al servidor
-    
-    console.log("entra 1");
-
+  useEffect(()=>{ // pide datos a la api para alimentar la petición al socket
     ////////////////////
-    // SOCKET CONNECTION
+    // SOCKET SETUP ////
     ////////////////////
-    socket.on("connect", () => {
-      console.log(socket.id); // x8WIv7-mJelg7on_ALbx
-    });
+    ws.current = new WebSocket("wss://ws-feed.exchange.coinbase.com");
 
     //////////////
     // API REQUEST
     //////////////
     const apiCall = async ()=> {
-
       // peticion
       await fetch(url + "/products")
       .then((res) => res.json())
       .then((data) => (pairs = data));
       console.log(pairs)
-
       // filtrar las criptos cruzadas con el euro
       let filtered = pairs.filter((pair) => {
         if (pair.quote_currency === "EUR") {
           return pair;
         }
       });
-
       // ordenar por nombre el array filtrado de criptos
       filtered = filtered.sort((a, b) => {
         if( a.base_currency == b.base_currency ) { return 0; }
         else return ( a.base_currency > b.base_currency ? 1 : -1 )
       });
-
       // console.log(filtered)
       setCurrencies(filtered);
-
       // evitar la conexion al socket si no hay un fetch previo
       flag.current = true;
     };
     apiCall();
-
   },[]) // render en la primera carga
 
 
-  useEffect(()=>{
-    console.log("entra 2")
+  useEffect(()=>{ // establece la conexión al socket siempre que haya una petición previa a la api
+    // anula la petición si no hay fetch previo
+    if (!flag.current) {
+      return; 
+    };
 
+    ///////////////////////
+    // SOCKET CONNECTION //
+    ///////////////////////
     let jsonMsg = JSON.stringify(subMsg);
-    // socket.on("message", jsonMsg);
-    socket.emit(jsonMsg);
-    
+    ws.current.send(jsonMsg);
     
     //////////////////////
     // EXTRACT SOCKET DATA
     //////////////////////
-    socket.on("connect", (e) => {
+    ws.current.onmessage = (e) => {
       let data = JSON.parse(e.data);
-      console.log(data);
-      // setprice(data.price);
+
       if (data.type !== "ticker") {
         return;
       }
       if (data.product_id === pair) {
         setprice(data.price);
       }
-    });
-    
-    socket.on("connect", () => {
-      console.log(socket.connected);
-    });
-    
+    };
+  
     /////////////////////////////////////////////////////////////////////////////////////////
     // esto te trae la información anterior a la última cotización para alimientar la gráfica
     /////////////////////////////////////////////////////////////////////////////////////////
@@ -134,26 +111,23 @@ const App = () => {
     // fetchHistoricalData();
 
     /////////////////////////////////////////////////////////////////////////////////////////
-
-    
-    console.log(socket.connected); 
   },[pair])
 
-  /////////////////
-  // CRYPT SELECTOR
-  /////////////////
+  // estoy comentando chorradas para parecer qeu soy productivo!!
+  
+  ////////////////////
+  // CRYPT SELECTOR //
+  ////////////////////
   const handleSelect = (e) => {
     // pedir la baja del socket
-    socket.emit(unSubMsg);
-
+    let jsonUnsub = JSON.stringify(unSubMsg);
+    ws.current.send(jsonUnsub);
     // setPair cambiará el estado de pair y lanzará el useEffect para una nueva petición de criptos
     setPair(e.target.value);
   };
-  /////////////////
-
-
+  
   const handleAskForConnect = () => {
-    setInfo(socket.connected ? "I'm connected": "I'm not connected") // true
+    console.log(ws.current);// true
   };
 
     return (
@@ -170,12 +144,10 @@ const App = () => {
             );
           })}
         </select>
-        <button onClick={handleAskForConnect}>¿Estoy conectado?</button>
-        <h2>{info}</h2>
+        <button onClick={handleAskForConnect}>Dame datos</button>
+        {/* <h2>{info}</h2> */}
         <Footer/>
       </div>
     );
-  
-}
-
+};
 export default App;
