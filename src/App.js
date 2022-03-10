@@ -1,24 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/header/header';
 import Footer from './components/footer/footer';
-import { io } from "socket.io-client";
-/////////////
-// REFERENCES
-/////////////
-// https://socket.io/docs/v4/client-with-bundlers/
-// https://docs.cloud.coinbase.com/exchange/docs/websocket-overview
 
 const App = () => {
   const [info, setInfo] = useState("I don't know");
   const [currencies, setCurrencies] = useState([]);
   const [pair, setPair] = useState("");
   const [price, setprice] = useState("0.00");
-  const ws = useRef(null);
-
-  
-
   const url = "https://api.pro.coinbase.com";
-  let first = useRef(false);
+  const ws = useRef(null);
   let flag = useRef(false);
   let pairs = [];
 
@@ -43,10 +33,7 @@ const App = () => {
     "channels": ["heartbeat"]
   }
   
-  useEffect(()=>{ // maneja la primera petición al servidor
-    
-    console.log("entra 1");
-
+  useEffect(()=>{ // pide datos a la api para alimentar la petición al socket
     ////////////////////
     // SOCKET SETUP ////
     ////////////////////
@@ -81,11 +68,11 @@ const App = () => {
   },[]) // render en la primera carga
 
 
-  useEffect(()=>{
+  useEffect(()=>{ // establece la conexión al socket siempre que haya una petición previa a la api
+    // anula la petición si no hay fetch previo
     if (!flag.current) {
-      return;
+      return; 
     };
-    console.log("entra 2");
 
     ///////////////////////
     // SOCKET CONNECTION //
@@ -98,8 +85,7 @@ const App = () => {
     //////////////////////
     ws.current.onmessage = (e) => {
       let data = JSON.parse(e.data);
-      console.log(data);
-      // setprice(data.price);
+
       if (data.type !== "ticker") {
         return;
       }
@@ -127,6 +113,8 @@ const App = () => {
     /////////////////////////////////////////////////////////////////////////////////////////
   },[pair])
 
+  // estoy comentando chorradas para parecer qeu soy productivo!!
+  
   ////////////////////
   // CRYPT SELECTOR //
   ////////////////////
@@ -138,7 +126,6 @@ const App = () => {
     setPair(e.target.value);
   };
   
-
   const handleAskForConnect = () => {
     console.log(ws.current);// true
   };
@@ -162,7 +149,5 @@ const App = () => {
         <Footer/>
       </div>
     );
-  
-}
-
+};
 export default App;
