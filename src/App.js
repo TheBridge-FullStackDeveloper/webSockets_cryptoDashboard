@@ -3,7 +3,7 @@ import Header from './components/header/header';
 import Footer from './components/footer/footer';
 
 const App = () => {
-  const [info, setInfo] = useState("I don't know");
+  const [pastData, setPastData] = useState({});
   const [currencies, setCurrencies] = useState([]);
   const [pair, setPair] = useState("");
   const [price, setprice] = useState("0.00");
@@ -112,8 +112,6 @@ const App = () => {
 
     /////////////////////////////////////////////////////////////////////////////////////////
   },[pair])
-
-  // estoy comentando chorradas para parecer qeu soy productivo!!
   
   ////////////////////
   // CRYPT SELECTOR //
