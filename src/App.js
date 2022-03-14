@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/header/header';
 import Footer from './components/footer/footer';
+import processData from './utils/data.js';
 
 const App = () => {
   const [pastData, setPastData] = useState({});
@@ -98,17 +99,17 @@ const App = () => {
     // esto te trae la información anterior a la última cotización para alimientar la gráfica
     /////////////////////////////////////////////////////////////////////////////////////////
 
-    // let historicalDataURL = `${url}/products/${pair}/candles?granularity=86400`;
-    // const fetchHistoricalData = async () => {
-    //   let dataArr = [];
-    //   await fetch(historicalDataURL)
-    //     .then((res) => res.json())
-    //     .then((data) => (dataArr = data));
+    let historicalDataURL = `${url}/products/${pair}/candles?granularity=86400`;
+    const fetchHistoricalData = async () => {
+      let dataArr = [];
+      await fetch(historicalDataURL)
+        .then((res) => res.json())
+        .then((data) => (dataArr = data));
     
-    //   let formattedData = formatData(dataArr);
-    //   setpastData(formattedData);
-    // };
-    // fetchHistoricalData();
+      let formattedData = processData(dataArr);
+      setPastData(formattedData);
+    };
+    fetchHistoricalData();
 
     /////////////////////////////////////////////////////////////////////////////////////////
   },[pair])
