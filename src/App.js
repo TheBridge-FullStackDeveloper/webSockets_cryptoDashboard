@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/header/header';
 import Footer from './components/footer/footer';
+import Dashboard from './components/dashboard/dashboard';
+
 import processData from './utils/data.js';
 
 const App = () => {
-  const [pastData, setPastData] = useState({});
+  const [pastData, setPastData] = useState([]);
   const [currencies, setCurrencies] = useState([]);
   const [pair, setPair] = useState("");
   const [price, setprice] = useState("0.00");
@@ -107,7 +109,15 @@ const App = () => {
         .then((data) => (dataArr = data));
     
       let formattedData = processData(dataArr);
-      setPastData(formattedData);
+
+      let dataTable = [
+        {
+          id: pair,
+          data: formattedData
+        }
+      ]
+
+      setPastData(dataTable);
     };
     fetchHistoricalData();
 
@@ -144,7 +154,9 @@ const App = () => {
           })}
         </select>
         <button onClick={handleAskForConnect}>Dame datos</button>
-        {/* <h2>{info}</h2> */}
+        <div style={{ height: 500 }}>
+          <Dashboard value={pastData}/>
+        </div>
         <Footer/>
       </div>
     );
