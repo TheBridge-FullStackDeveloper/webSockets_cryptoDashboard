@@ -3,7 +3,7 @@ import Header from './components/header/header';
 import Footer from './components/footer/footer';
 import Dashboard from './components/dashboard/dashboard';
 
-import processData from './utils/data.js';
+import {processData, thicker} from './utils/data.js';
 
 const App = () => {
   const [pastData, setPastData] = useState([]);
@@ -116,7 +116,7 @@ const App = () => {
           data: formattedData
         }
       ]
-
+      // thicker(dataTable)
       setPastData(dataTable);
     };
     fetchHistoricalData();

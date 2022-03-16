@@ -1,8 +1,10 @@
 import React from "react";
 import {ResponsiveLine} from '@nivo/line';
+import { thicker } from "../../utils/data";
 
-
-const Dashboard = ({value}) => (
+const Dashboard = ({value}) => {
+  // let dataToBottom = thicker(value)
+  return (
   <ResponsiveLine
 
           data={value}
@@ -28,12 +30,13 @@ const Dashboard = ({value}) => (
           curve="cardinal"
           axisBottom={{
             orient: 'bottom',
+            // tickValues: dataToBottom,
             tickSize: 5,
             tickPadding: 5,
-            tickRotation: 0,
+            tickRotation: 90,
             legend: 'date',
             legendOffset: 36,
-            legendPosition: 'center'
+            legendPosition: 'middle'
           }}
           axisLeft={{
             orient: 'left',
@@ -42,7 +45,7 @@ const Dashboard = ({value}) => (
             tickRotation: 0,
             legend: 'price',
             legendOffset: -40,
-            legendPosition: 'center'
+            legendPosition: 'middle'
           }}
           dotSize={10}
           dotColor="inherit:darker(0.3)"
@@ -54,6 +57,7 @@ const Dashboard = ({value}) => (
           animate={true}
           motionStiffness={90}
           motionDamping={15}
+          useMesh={true}
           legends={[
             {
               anchor: 'bottom-right',
@@ -81,8 +85,9 @@ const Dashboard = ({value}) => (
             }
           ]}
 
-        />
 
-);
+        />
+        
+);}
 
 export default Dashboard;
