@@ -3,11 +3,11 @@ import {ResponsiveLine} from '@nivo/line';
 import { thicker } from "../../utils/data";
 
 const Dashboard = ({value}) => {
-  // let dataToBottom = thicker(value)
+  const {pastData,tickData} = value
   return (
   <ResponsiveLine
 
-          data={value}
+          data={pastData}
 
           margin={{
             top: 50,
@@ -30,12 +30,12 @@ const Dashboard = ({value}) => {
           curve="cardinal"
           axisBottom={{
             orient: 'bottom',
-            // tickValues: dataToBottom,
-            tickSize: 5,
-            tickPadding: 5,
-            tickRotation: 90,
+            tickValues: tickData,
+            tickSize: 0,
+            tickPadding: 10,
+            tickRotation: 40,
             legend: 'date',
-            legendOffset: 36,
+            legendOffset: 60,
             legendPosition: 'middle'
           }}
           axisLeft={{

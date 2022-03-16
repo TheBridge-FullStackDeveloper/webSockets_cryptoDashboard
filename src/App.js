@@ -7,6 +7,7 @@ import {processData, thicker} from './utils/data.js';
 
 const App = () => {
   const [pastData, setPastData] = useState([]);
+  const [tickData, setTickData] = useState([])
   const [currencies, setCurrencies] = useState([]);
   const [pair, setPair] = useState("");
   const [price, setprice] = useState("0.00");
@@ -116,7 +117,10 @@ const App = () => {
           data: formattedData
         }
       ]
-      // thicker(dataTable)
+      // setea 1/10 de las fechas para una mejor presentación
+      let dataToBottom = thicker(dataTable)
+      setTickData(dataToBottom)
+      // setea etiquetas, fechas y valores para la grafica
       setPastData(dataTable);
     };
     fetchHistoricalData();
@@ -155,7 +159,7 @@ const App = () => {
         </select>
         <button onClick={handleAskForConnect}>Dame datos</button>
         <div style={{ height: 500 }}>
-          <Dashboard value={pastData}/>
+          <Dashboard value={ {pastData,tickData} }/>
         </div>
         <Footer/>
       </div>
