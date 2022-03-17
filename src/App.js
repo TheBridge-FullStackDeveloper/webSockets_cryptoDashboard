@@ -46,25 +46,30 @@ const App = () => {
     //////////////
     // API REQUEST
     //////////////
+
     const apiCall = async ()=> {
+
       // peticion
       await fetch(url + "/products")
       .then((res) => res.json())
       .then((data) => (pairs = data));
-      console.log(pairs)
+      
       // filtrar las criptos cruzadas con el euro
       let filtered = pairs.filter((pair) => {
         if (pair.quote_currency === "EUR") {
           return pair;
         }
       });
+
       // ordenar por nombre el array filtrado de criptos
       filtered = filtered.sort((a, b) => {
         if( a.base_currency == b.base_currency ) { return 0; }
         else return ( a.base_currency > b.base_currency ? 1 : -1 )
       });
+
       // console.log(filtered)
       setCurrencies(filtered);
+
       // evitar la conexion al socket si no hay un fetch previo
       flag.current = true;
     };
@@ -116,10 +121,12 @@ const App = () => {
           id: pair,
           data: formattedData
         }
-      ]
+      ];
+
       // setea 1/10 de las fechas para una mejor presentación
       let dataToBottom = thicker(dataTable)
-      setTickData(dataToBottom)
+      setTickData(dataToBottom);
+
       // setea etiquetas, fechas y valores para la grafica
       setPastData(dataTable);
     };
@@ -132,9 +139,11 @@ const App = () => {
   // CRYPT SELECTOR //
   ////////////////////
   const handleSelect = (e) => {
+
     // pedir la baja del socket
     let jsonUnsub = JSON.stringify(unSubMsg);
     ws.current.send(jsonUnsub);
+
     // setPair cambiará el estado de pair y lanzará el useEffect para una nueva petición de criptos
     setPair(e.target.value);
   };
@@ -142,7 +151,6 @@ const App = () => {
   const handleAskForConnect = () => {
     console.log(ws.current);// true
   };
-
     return (
       <div className="App">
         <Header/>

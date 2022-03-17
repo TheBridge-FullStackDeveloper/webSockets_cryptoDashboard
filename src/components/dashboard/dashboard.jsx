@@ -84,8 +84,6 @@ const Dashboard = ({value}) => {
               ]
             }
           ]}
-
-
         />
         
 );}
