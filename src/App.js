@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import Header from './components/header/header';
 import Footer from './components/footer/footer';
 import Dashboard from './components/dashboard/dashboard';
-
 import {processData, thicker} from './utils/data.js';
+import "./styles/styles.css";
 
 const App = () => {
   const [pastData, setPastData] = useState([]);
@@ -77,7 +77,9 @@ const App = () => {
   },[]) // render en la primera carga
 
 
-  useEffect(()=>{ // establece la conexión al socket siempre que haya una petición previa a la api
+  // establece la conexión al socket siempre que haya una petición previa a la api
+  useEffect(()=>{ 
+    
     // anula la petición si no hay fetch previo
     if (!flag.current) {
       return; 
@@ -106,7 +108,6 @@ const App = () => {
     /////////////////////////////////////////////////////////////////////////////////////////
     // esto te trae la información anterior a la última cotización para alimientar la gráfica
     /////////////////////////////////////////////////////////////////////////////////////////
-
     let historicalDataURL = `${url}/products/${pair}/candles?granularity=86400`;
     const fetchHistoricalData = async () => {
       let dataArr = [];
@@ -148,26 +149,27 @@ const App = () => {
     setPair(e.target.value);
   };
   
-  const handleAskForConnect = () => {
-    console.log(ws.current);// true
-  };
+  // const handleAskForConnect = () => {
+  //   console.log(ws.current);// true
+  // };
     return (
       <div className="App">
         <Header/>
-        <h1>`€{price}`</h1>
-
-        <select name="currency" value={pair} onChange={handleSelect}>
-          {currencies.map((e, i) => {
-            return (
-              <option key={i} value={e.id}>
-                {e.display_name}
-              </option>
-            );
-          })}
-        </select>
-        <button onClick={handleAskForConnect}>Dame datos</button>
+        <div className='square'>
+          <h1>`€{price}`</h1>
+          <select name="currency" value={pair} onChange={handleSelect}>
+            {currencies.map((e, i) => {
+              return (
+                <option key={i} value={e.id}>
+                  {e.display_name}
+                </option>
+              );
+            })}
+          </select>
+        </div>
+        {/* <button onClick={handleAskForConnect}>Dame datos</button> */}
         <div style={{ height: 500 }}>
-          <Dashboard value={ {pastData,tickData} }/>
+          <Dashboard className="dashboard" value={ { pastData, tickData } }/>
         </div>
         <Footer/>
       </div>

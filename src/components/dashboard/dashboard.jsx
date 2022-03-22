@@ -1,6 +1,5 @@
 import React from "react";
 import {ResponsiveLine} from '@nivo/line';
-import { thicker } from "../../utils/data";
 
 const Dashboard = ({value}) => {
   const {pastData,tickData} = value

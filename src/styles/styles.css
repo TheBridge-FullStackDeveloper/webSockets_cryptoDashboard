@@ -1,0 +1,24 @@
+.square {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* margin-left: auto;
+    margin-right: auto; */
+}
+.dashboard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.header {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    background-color: red;
+}
+.footer {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    background-color: red;
+}
