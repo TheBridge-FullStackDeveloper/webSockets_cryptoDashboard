@@ -1,7 +1,8 @@
 const processData = (input) => {
-    console.log(input);
-    return input.map(e=>{
 
+    input.reverse()
+    return input.map(e=>{
+        
         let date = new Date(e[0] * 1000);
         let day = date.getDate();
         let month = date.getMonth() + 1;
@@ -12,12 +13,11 @@ const processData = (input) => {
     });
 };
     // setea 1/10 de las fechas para una mejor presentación
-    const thicker = (array) => {
-    let input = array[0]?.data;
-    let output = [];
-    input.map(({x},i) => { if (i%10==0) { output.push(x) };} );
-
-    return output
+const thicker = (array) => {
+let input = array[0]?.data;
+let output = [];
+input.map(({x},i) => { if (i%10==0) { output.push(x) };} );
+return output
 }
 
 export {

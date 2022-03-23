@@ -19,29 +19,34 @@ const App = () => {
   ///////////////////////////
   // SERVER'S MESSAGE REQUEST
   ///////////////////////////
-  let subMsg = 
-  {
-    "type": "subscribe",
-    "product_ids": ["ETH-USD","ETH-EUR"],
-    "channels": [
-        "level2",
-        "heartbeat",
-        {
-            "name": "ticker",
-            "product_ids": [pair]
-        }
-    ]
-  };
-  let unSubMsg = {
-    "type": "unsubscribe",
-    "channels": ["heartbeat"]
-  }
-  
-  useEffect(()=>{ // pide datos a la api para alimentar la petición al socket
+  ///////////////////////////////////////////////////////////// descomentar para funcionar
+  // let subMsg = 
+  // {
+  //   "type": "subscribe",
+  //   "product_ids": ["ETH-USD","ETH-EUR"],
+  //   "channels": [
+  //       "level2",
+  //       "heartbeat",
+  //       {
+  //           "name": "ticker",
+  //           "product_ids": [pair]
+  //       }
+  //   ]
+  // };
+  // let unSubMsg = {
+  //   "type": "unsubscribe",
+  //   "channels": ["heartbeat"]
+  // }
+
+  ///////////////////////////////////////////////////////////
+  // pide datos a la api para alimentar la petición al socket
+  ///////////////////////////////////////////////////////////
+  useEffect(()=>{ 
     ////////////////////
     // SOCKET SETUP ////
     ////////////////////
-    ws.current = new WebSocket("wss://ws-feed.exchange.coinbase.com");
+  ///////////////////////////////////////////////////////////// descomentar para funcionar
+    // ws.current = new WebSocket("wss://ws-feed.exchange.coinbase.com");
 
     //////////////
     // API REQUEST
@@ -88,27 +93,31 @@ const App = () => {
     ///////////////////////
     // SOCKET CONNECTION //
     ///////////////////////
-    let jsonMsg = JSON.stringify(subMsg);
-    ws.current.send(jsonMsg);
+  ///////////////////////////////////////////////////////////// descomentar para funcionar
+    // let jsonMsg = JSON.stringify(subMsg);
+    // ws.current.send(jsonMsg);
     
     //////////////////////
     // EXTRACT SOCKET DATA
     //////////////////////
-    ws.current.onmessage = (e) => {
-      let data = JSON.parse(e.data);
+  ///////////////////////////////////////////////////////////// descomentar para funcionar
+    // ws.current.onmessage = (e) => {
+    //   let data = JSON.parse(e.data);
 
-      if (data.type !== "ticker") {
-        return;
-      }
-      if (data.product_id === pair) {
-        setprice(data.price);
-      }
-    };
+    //   if (data.type !== "ticker") {
+    //     return;
+    //   }
+    //   if (data.product_id === pair) {
+    //     setprice(data.price);
+    //   }
+    // };
   
     /////////////////////////////////////////////////////////////////////////////////////////
     // esto te trae la información anterior a la última cotización para alimientar la gráfica
     /////////////////////////////////////////////////////////////////////////////////////////
-    let historicalDataURL = `${url}/products/${pair}/candles?granularity=86400`;
+
+  ///////////////////////////////////////////////////////////// descomentar para funcionar
+    // let historicalDataURL = `${url}/products/${pair}/candles?granularity=86400`;
     const fetchHistoricalData = async () => {
       let dataArr = [];
       await fetch(historicalDataURL)
@@ -139,15 +148,15 @@ const App = () => {
   ////////////////////
   // CRYPT SELECTOR //
   ////////////////////
-  const handleSelect = (e) => {
+  ///////////////////////////////////////////////////////////// descomentar para funcionar
+  // const handleSelect = (e) => {
+  //   // pedir la baja del socket
+  //   let jsonUnsub = JSON.stringify(unSubMsg);
+  //   ws.current.send(jsonUnsub);
 
-    // pedir la baja del socket
-    let jsonUnsub = JSON.stringify(unSubMsg);
-    ws.current.send(jsonUnsub);
-
-    // setPair cambiará el estado de pair y lanzará el useEffect para una nueva petición de criptos
-    setPair(e.target.value);
-  };
+  //   // setPair cambiará el estado de pair y lanzará el useEffect para una nueva petición de criptos
+  //   setPair(e.target.value);
+  // };
   
   // const handleAskForConnect = () => {
   //   console.log(ws.current);// true
