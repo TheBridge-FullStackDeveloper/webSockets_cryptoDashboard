@@ -116,7 +116,7 @@ const App = () => {
     // esto te trae la información anterior a la última cotización para alimientar la gráfica
     /////////////////////////////////////////////////////////////////////////////////////////
 
-  ///////////////////////////////////////////////////////////// descomentar para funcionar
+    /////////////////////////////////////////////////////////// descomentar para funcionar
     // let historicalDataURL = `${url}/products/${pair}/candles?granularity=86400`;
     const fetchHistoricalData = async () => {
       let dataArr = [];
