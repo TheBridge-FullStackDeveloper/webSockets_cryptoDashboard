@@ -17,5 +17,3 @@ A esta conexión hay que acompañarle un mensaje que confirme la suscripción al
 https://api.exchange.coinbase.com/products/{product_id}/candles
 
 A esta url hay que sustituir {product_id} por el producto a pedir 
-
-![meme](./assets/criptomeme-5.jpg.webp)
