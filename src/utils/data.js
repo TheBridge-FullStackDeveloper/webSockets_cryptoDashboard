@@ -1,5 +1,5 @@
 const processData = (input) => {
-    console.log(input);
+    input.reverse()
     return input.map(e=>{
 
         let date = new Date(e[0] * 1000);
