@@ -18,4 +18,15 @@ https://api.exchange.coinbase.com/products/{product_id}/candles
 
 A esta url hay que sustituir {product_id} por el producto a pedir 
 
+Esta app corre con Node @16.14.0 y Npm @8.5.4
+
+```bash
+# Instalar dependencias
+$ npm ci
+```
+```bash
+# Lanzar app
+$ npm start
+```
+
 ![meme](./assets/criptomeme-5.jpg.webp)
