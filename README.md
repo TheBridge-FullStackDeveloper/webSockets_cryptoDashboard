@@ -4,7 +4,7 @@ Puedes probar la aplicación desplegada [aquí](https://gregarious-dusk-5d357b.n
 
 # Websockets criptodashboard
 
-Este daschboard se nutre principalmente de un websocket feed del que rescata la cotización en tiempo real de la cripto deseada, así como una API de la que extrae el los datos históricos de su cotización.
+Este dashboard se nutre principalmente de un websocket feed del que rescata la cotización en tiempo real de la cripto deseada, así como una API de la que extrae el los datos históricos de su cotización.
 
 Podemos comprobar cualquier enlace ws en esta web: https://www.piesocket.com/websocket-tester
 
